@@ -6,6 +6,9 @@ import org.serviio.library.online.*
  * YouTube plugin for Serviio.
  *
  * @author Eugene Khrustalev <eugene.khrustalev@gmail.com>
+ *
+ * @link https://medium.com/@paramsingh_66174/developing-a-progressive-fetch-youtube-downloader-75a709bff1ef
+ * @link https://tyrrrz.me/blog/reverse-engineering-youtube
  */
 class YouTube extends WebResourceUrlExtractor {
 
@@ -17,38 +20,38 @@ class YouTube extends WebResourceUrlExtractor {
     final USER_AGENT = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)'
 
     /**
-     * Comment formats that you do not need play or your player not supported
+     * Comment formats that you do not want to play or your player not supported
      * @see https://tyrrrz.me/blog/reverse-engineering-youtube
      */
     final FORMATS = [
         (PreferredQuality.HIGH): [
-            ['id': '38',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 3072p'],
-            ['id': '37',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 1080p'],
-            ['id': '85',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 1080p'],
-            ['id': '22',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 720p'],
-            ['id': '84',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 720p'],
-            ['id': '95',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 720p'],
-            ['id': '96',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 720p'],
-            ['id': '46',  'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 1080p'],
-            ['id': '45',  'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 720p'],
-            ['id': '102', 'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 720p'],
+            ['id': '38',  'description': 'MP4/H264/AAC 3072p'],
+            ['id': '37',  'description': 'MP4/H264/AAC 1080p'],
+            ['id': '85',  'description': 'MP4/H264/AAC 1080p'],
+            ['id': '22',  'description': 'MP4/H264/AAC 720p'],
+            ['id': '84',  'description': 'MP4/H264/AAC 720p'],
+            ['id': '95',  'description': 'MP4/H264/AAC 720p'],
+            ['id': '96',  'description': 'MP4/H264/AAC 720p'],
+            ['id': '46',  'description': 'WEBM/Vorbis/VP8 1080p'],
+            ['id': '45',  'description': 'WEBM/Vorbis/VP8 720p'],
+            ['id': '102', 'description': 'WEBM/Vorbis/VP8 720p'],
         ],
         (PreferredQuality.MEDIUM): [
-            ['id': '59',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 480p'],
-            ['id': '78',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 480p'],
-            ['id': '83',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 480p'],
-            ['id': '94',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 480p'],
-            ['id': '44',  'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 480p'],
-            ['id': '101', 'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 480p'],
-            ['id': '35',  'mime': 'video/x-flv', 'description': 'FLV/H264/AAC 480p'],
+            ['id': '59',  'description': 'MP4/H264/AAC 480p'],
+            ['id': '78',  'description': 'MP4/H264/AAC 480p'],
+            ['id': '83',  'description': 'MP4/H264/AAC 480p'],
+            ['id': '94',  'description': 'MP4/H264/AAC 480p'],
+            ['id': '44',  'description': 'WEBM/Vorbis/VP8 480p'],
+            ['id': '101', 'description': 'WEBM/Vorbis/VP8 480p'],
+            ['id': '35',  'description': 'FLV/H264/AAC 480p'],
         ],
         (PreferredQuality.LOW): [
-            ['id': '18',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 360p'],
-            ['id': '82',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 360p'],
-            ['id': '93',  'mime': 'video/mp4',   'description': 'MP4/H264/AAC 360p'],
-            ['id': '43',  'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 360p'],
-            ['id': '100', 'mime': 'video/webm',  'description': 'WEBM/Vorbis/VP8 360p'],
-            ['id': '34',  'mime': 'video/x-flv', 'description': 'FLV/H264/AAC 360p'],
+            ['id': '18',  'description': 'MP4/H264/AAC 360p'],
+            ['id': '82',  'description': 'MP4/H264/AAC 360p'],
+            ['id': '93',  'description': 'MP4/H264/AAC 360p'],
+            ['id': '43',  'description': 'WEBM/Vorbis/VP8 360p'],
+            ['id': '100', 'description': 'WEBM/Vorbis/VP8 360p'],
+            ['id': '34',  'description': 'FLV/H264/AAC 360p'],
         ]
     ]
 
@@ -132,7 +135,7 @@ class YouTube extends WebResourceUrlExtractor {
                 def snippet = it.snippet
                 def resourceItem = new WebResourceItem(title: snippet.title
                     , description: snippet.description
-                    , additionalInfo: ['videoId': it.id, 'thumbnails': snippet.thumbnails])
+                    , additionalInfo: ['videoId': it.id, 'thumbnails': snippet.thumbnails, 'el': ['embedded', 'detailpage']])
                 try {
                     resourceItem.releaseDate = new InternetDateFormat().parse(snippet.publishedAt)
                 } catch (Exception ex) {
@@ -183,7 +186,7 @@ class YouTube extends WebResourceUrlExtractor {
                         if (videoId) {
                             def resourceItem = new WebResourceItem(title: snippet.title
                                 , description: snippet.description
-                                , additionalInfo: ['videoId': videoId, 'thumbnails': snippet.thumbnails])
+                                , additionalInfo: ['videoId': videoId, 'thumbnails': snippet.thumbnails, 'el': ['embedded', 'detailpage']])
                             try {
                                 resourceItem.releaseDate = new InternetDateFormat().parse(snippet.publishedAt)
                             } catch (Exception ex) {
@@ -236,77 +239,79 @@ class YouTube extends WebResourceUrlExtractor {
     @Override
     protected ContentURLContainer extractUrl(WebResourceItem item, PreferredQuality quality) {
         String videoId = item.additionalInfo.videoId
-        String el = item.additionalInfo.detailPage ? '&el=detailpage' : ''
-        log("Looking for URL for video(id=$videoId, title=${item.title}). detailpage=${!el.isEmpty()}...")
+        String el = item.additionalInfo.el ? "&el=${item.additionalInfo.el[0]}" : ''
+        //el = '&html5=1'
+        log("Looking for URL for video(id=$videoId, title=${item.title}). el=${el}...")
         if (videoId) {
             def info = openURL(new URL("https://www.youtube.com/get_video_info?video_id=$videoId$el&key=$YOUTUBE_API_KEY"), USER_AGENT)
             if (info) {
                 def qs = parseQS(info)
-                def formatId = null, formatMimeType = null, formatDescription = null
+                def formatId = null
                 if (qs.fmt_list) {
-                    def lastIdx = -1
                     def fmtList = URLDecoder.decode(qs.fmt_list, 'UTF-8')
-                    log("Video available in format:$fmtList")
-                    fmtList.split(',').each {
-                        def format = it.split('/', 2)[0]
-                        // Find better format from available
-                        for (int i = 0; i < FORMATS[quality].size(); i++) {
-                            def entry = FORMATS[quality][i]
-                            if (entry.id == format && (lastIdx == -1 || lastIdx < i)) {
+                    log("Video available in formats: $fmtList")
+                    def formats = []
+                    // If requested High quality video then script will see from HIGH to LOW quality formats
+                    // For medium quality script will see from MEDIUM to LOW quality formats
+                    switch (quality) {
+                        case PreferredQuality.HIGH:
+                            formats.addAll(FORMATS[PreferredQuality.HIGH])
+                        case PreferredQuality.MEDIUM:
+                            formats.addAll(FORMATS[PreferredQuality.MEDIUM])
+                        default:
+                            formats.addAll(FORMATS[PreferredQuality.LOW])
+                    }
+                    // Find better format from available
+                    outer: for(fmt in fmtList.split(',')) {
+                        def format = fmt.split('/', 2)[0]
+                        for (int i = 0; i < formats.size(); i++) {
+                            def entry = formats[i]
+                            if (entry.id == format) {
                                 formatId = entry.id
-                                formatMimeType = entry.mime
-                                formatDescription = entry.description
-                                lastIdx = i
-                                log("Selected video format(id=$formatId, mime=$formatMimeType, description=$formatDescription)")
-                                break
+                                log("Will be used video format $formatId/${entry.description}")
+                                break outer
                             }
                         }
                     }
                 }
                 if (qs.url_encoded_fmt_stream_map) {
-                    def fmtStreamMap = parseQS(URLDecoder.decode(qs.url_encoded_fmt_stream_map, 'UTF-8'))
-                    if (fmtStreamMap.url || fmtStreamMap.conn) {
-                        def uri = new URI(URLDecoder.decode(fmtStreamMap.url ?: fmtStreamMap.conn, 'UTF-8'))
-                        Date expiresOn = null
-                        boolean rebuildQuery = false
-                        if (uri.query) {
-                            qs = parseQS(uri.query)
-                            if (formatId && "$formatId" != "${qs.itag}") {
-                                // Reconstruct URL for better format
-                                log("Default video format(id=${qs.itag}) has been replaced to format(id=$formatId, mime=$formatMimeType, description=$formatDescription)")
-                                qs.itag = formatId
-                                qs.mime = formatMimeType
-                                rebuildQuery = true
+                    for (streamMap in URLDecoder.decode(qs.url_encoded_fmt_stream_map, 'UTF-8').split(',')) {
+                        def fmtStreamMap = parseQS(streamMap)
+                        if (!formatId || "$formatId" == "${fmtStreamMap.itag}") {
+                            if (fmtStreamMap.url || fmtStreamMap.conn) {
+                                def uri = new URI(URLDecoder.decode(fmtStreamMap.url ?: fmtStreamMap.conn, 'UTF-8'))
+                                Date expiresOn = null
+                                if (uri.query) {
+                                    qs = parseQS(uri.query)
+                                    if (qs.expire) {
+                                        expiresOn = new Date(Long.parseLong(qs.expire) * 1000)
+                                        log("Video will be expired after $expiresOn")
+                                    }
+                                }
+                                // TODO HEAD url for test video availability
+                                return new ContentURLContainer(contentUrl: uri.toString(),
+                                    cacheKey: "${getClass().getName()}-$videoId-${fmtStreamMap.itag}",
+                                    thumbnailUrl: extractThumbnail(item.additionalInfo.thumbnails),
+                                    expiresOn: expiresOn, expiresImmediately: expiresOn == null,
+                                    userAgent: USER_AGENT
+                                )
+                            } else {
+                                // Should never comes here
+                                // if format is found but no url given
+                                formatId = null
                             }
-                            if (qs.expire) {
-                                expiresOn = new Date(Long.parseLong(qs.expire) * 1000)
-                                log("Video will be expired after $expiresOn")
-                            }
-                        } else if (formatId) {
-                            qs.itag = formatId
-                            qs.mime = formatMimeType
-                            rebuildQuery = true
                         }
-                        if (rebuildQuery) {
-                            uri.query = qs.collect { k,v -> "$k=$v" }.join("&")
-                        }
-                        return new ContentURLContainer(contentUrl: uri.toString(),
-                            cacheKey: "${getClass().getName()}-$videoId-$formatId",
-                            thumbnailUrl: extractThumbnail(item.additionalInfo.thumbnails),
-                            expiresOn: expiresOn, expiresImmediately: expiresOn == null,
-                            userAgent: USER_AGENT
-                         )
                     }
                 }
             }
         }
         // If no URL extracted then recursive try with el=detailpage parameter
-        if (!el) {
-            log("No video URL extracted. Trying with 'el=detailpage' parameter...")
-            item.additionalInfo.detailPage = true
+        if (item.additionalInfo.el) {
+            log("No video URL extracted. Trying with next 'el' parameter...")
+            item.additionalInfo.el.removeAt(0)
             return extractUrl(item, quality)
         }
-        log("No video URL extracted")
+        log("No URL extracted for videoId=$videoId")
         return null
     }
 
@@ -389,9 +394,9 @@ class YouTube extends WebResourceUrlExtractor {
 //        youtube.extractItems(new URL("https://www.youtube.com/playlist/PLQ3I0JQjWkbpZEXClB6GqXEwhUr7OXykH"), 30)
 //        youtube.extractItems(new URL("https://www.youtu.be/channel/UCcG10lsoPEHx49kgJL1SwIg"), -1)
 
-        def container1 = youtube.extractItems(new URL("https://www.youtube.com/watch?v=VjMCh9HP0N0"), -1)
+        def container1 = youtube.extractItems(new URL("https://youtu.be/SVh25Ic815I"), -1)
         assert container1.items
-        def container2 = youtube.extractUrl(container1.items[0], PreferredQuality.HIGH)
+        def container2 = youtube.extractUrl(container1.items[0], PreferredQuality.MEDIUM)
         assert container2
     }
 }
